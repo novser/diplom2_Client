@@ -7,11 +7,9 @@ import java.util.stream.Collectors;
 
 public class Main {
 
-    private static final String settingsPath = "C:\\my life\\JavaProjects\\Netology\\diploms\\diploma2_Client\\diploma2_Client\\src\\main\\resources\\settings.txt";
+    private static final String settingsPath = "src\\main\\resources\\settings.txt";
 
     public static void main(String[] args) {
-//        File file = new File("testJAVA.txt");
-//        file.createNewFile();
         new Client().start();
     }
 

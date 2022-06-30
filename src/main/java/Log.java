@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Log {
-    private static File logFile = new File("C:\\my life\\JavaProjects\\Netology\\diploms\\diploma2_Client\\diploma2_Client\\src\\main\\resources\\File.log");
+    private static File logFile = new File("src\\main\\resources\\File.log");
     private static final SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private static StringBuilder log = new StringBuilder();
     private static final String inputMassagePattern = "От пользователя %s пришло сообщение: \"%s\"";
