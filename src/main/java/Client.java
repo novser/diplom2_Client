@@ -5,12 +5,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Client extends Thread{
+public class Client extends Thread {
 
     private final int port;
     private final String ip;
     private int buffer;
-    private  String name = "";
+    private String name = "";
     private final String massageToConsolePattern = "%s : %s\n";
 
     public Client() {
