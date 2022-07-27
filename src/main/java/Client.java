@@ -1,7 +1,5 @@
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
+import java.net.Socket;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -9,7 +7,6 @@ public class Client extends Thread {
 
     private final int port;
     private final String ip;
-    private int buffer;
     private String name = "";
     private final String massageToConsolePattern = "%s : %s\n";
 
@@ -17,38 +14,39 @@ public class Client extends Thread {
         Map<String, String> settings = Main.getSettings(name);
         this.ip = settings.get("ip");
         this.port = Integer.parseInt(settings.get("port"));
-        this.buffer = Integer.parseInt(settings.get("buffer"));
     }
 
     @Override
     public void run() {
-        InetSocketAddress socketAddress = new InetSocketAddress(ip, port);
-        try (final SocketChannel socketChannel = SocketChannel.open();
+        try (Socket socket = new Socket(ip, port);
+             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
              Scanner scanner = new Scanner(System.in)) {
-            socketChannel.connect(socketAddress);
-            final ByteBuffer inputBuffer = ByteBuffer.allocate(buffer);
             System.out.println("Введите никнейм:");
             name = scanner.nextLine();
             Log.writeStart(name);
-            String text;
+            String msg;
+            System.out.println("Введите сообщение или \"exit\" для выхода");
             while (true) {
-                System.out.println("Введите сообщение или \"exit\" для выхода");
-                text = scanner.nextLine();
-                if ("exit".equals(text)) break;
-                Massage outputMassage = new Massage(name, text);
-                String jsonString = JsonHelper.getJsonTextFromMassage(outputMassage);
-                socketChannel.write(ByteBuffer.wrap(jsonString.getBytes(StandardCharsets.UTF_8)));
-                Log.writeOutputMassage(name, outputMassage);
+                if (scanner.hasNext()) {
+                    msg = scanner.nextLine();
+                    if ("exit".equals(msg)) {
+                        Log.writeFinish(name);
+                        break;
+                    }
+                    Massage outputMassage = JsonHelper.getMassageFromJson(msg);
+                    System.out.println(String.format(massageToConsolePattern, "Вы", outputMassage.getText()));
+                    out.println(JsonHelper.getJsonTextFromMassage(outputMassage));
+                    Log.writeOutputMassage(name, outputMassage);
+                }
 
-                int bytesCount = socketChannel.read(inputBuffer);
-                Massage inputMassage = JsonHelper.getMassageFromJson(new String(inputBuffer.array(), 0, bytesCount, StandardCharsets.UTF_8).trim());
+                Massage inputMassage = JsonHelper.getMassageFromJson(in.readLine());
                 System.out.println(String.format(massageToConsolePattern, inputMassage.getSender(), inputMassage.getText()));
                 Log.writeInputMassage(name, inputMassage);
-                inputBuffer.clear();
             }
         } catch (Exception e) {
             Log.writeError(name, e.getMessage());
         }
-        Log.writeFinish(name);
+
     }
 }
