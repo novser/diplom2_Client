@@ -32,12 +32,12 @@ public class Log {
         writeLog(name, "отключение");
     }
 
-    public static void writeInputMassage(String name, Massage massage) {
-        writeLog(name, String.format(inputMassagePattern, massage.getSender(), massage.getText()));
+    public static void writeInputMassage(String name, String text) {
+        writeLog(name, String.format(inputMassagePattern, name, text));
     }
 
-    public static void writeOutputMassage(String name, Massage massage) {
-        writeLog(name, String.format(outputMassagePattern, massage.getSender(), massage.getText()));
+    public static void writeOutputMassage(String name, String text) {
+        writeLog(name, String.format(outputMassagePattern, name, text));
     }
 
     public static void writeError(String name, String error) {
